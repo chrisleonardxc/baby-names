@@ -1,0 +1,374 @@
+:root {
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: #1f2430;
+  background: #f7f7fb;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e4e4ec;
+}
+
+.app-header h1 {
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.viewer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.viewer-toggle__label {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.viewer-toggle__pills {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.viewer-toggle__pill {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.viewer-toggle__pill.is-active {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 1rem;
+  padding: 0 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e4e4ec;
+}
+
+.nav-tabs a {
+  display: inline-block;
+  padding: 0.75rem 0.25rem;
+  color: #4b5563;
+  text-decoration: none;
+  border-bottom: 2px solid transparent;
+}
+
+.nav-tabs a.is-active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+  font-weight: 600;
+}
+
+.page {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  align-items: start;
+}
+
+.page__hint {
+  grid-column: 1 / -1;
+  color: #4b5563;
+  margin: 0;
+}
+
+.filter-panel {
+  background: #fff;
+  border: 1px solid #e4e4ec;
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.filter-panel__group label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.4rem;
+}
+
+.filter-panel__seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.filter-panel__seg button,
+.filter-panel__chips button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.filter-panel__seg button.is-active,
+.filter-panel__chips button.is-active {
+  background: #eef2ff;
+  border-color: #4f46e5;
+  color: #4f46e5;
+  font-weight: 600;
+}
+
+.filter-panel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.filter-panel__chips--wrap {
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.filter-panel__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin-top: 0.5rem;
+}
+
+.filter-panel__range {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.results-grid__summary {
+  margin-bottom: 0.75rem;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.results-grid__status {
+  padding: 2rem;
+  text-align: center;
+  color: #6b7280;
+}
+
+.results-grid__status--error {
+  color: #dc2626;
+}
+
+.results-grid__spinner {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.9rem;
+  margin-left: 0.5rem;
+  border: 2px solid #d1d5db;
+  border-top-color: #4f46e5;
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.6s linear infinite;
+}
+
+.results-grid__loading-banner {
+  padding: 0.5rem 0;
+  color: #4f46e5;
+  font-size: 0.85rem;
+}
+
+.results-grid.is-loading {
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.results-grid__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.results-grid__pagination button {
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.4rem 0.9rem;
+}
+
+.results-grid__pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.name-card {
+  background: #fff;
+  border: 1px solid #e4e4ec;
+  border-radius: 12px;
+  padding: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.name-card.is-vetoed {
+  opacity: 0.55;
+}
+
+.name-card__name {
+  border: none;
+  background: none;
+  padding: 0;
+  text-align: left;
+  font-size: 1.1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #1f2430;
+}
+
+.name-card__sex-badge {
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-weight: 700;
+}
+
+.sex-M {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.sex-F {
+  background: #fce7f3;
+  color: #be185d;
+}
+
+.name-card__countries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+  color: #374151;
+}
+
+.name-card__country-stat {
+  background: #f3f4f6;
+  border-radius: 6px;
+  padding: 0.15rem 0.4rem;
+}
+
+.name-card__trend {
+  margin-left: 0.2rem;
+}
+
+.name-card__meta {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+.name-card__actions {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.name-card__react {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0.35rem 0;
+  font-size: 0.8rem;
+}
+
+.name-card__react.is-active {
+  background: #4f46e5;
+  border-color: #4f46e5;
+  color: #fff;
+}
+
+.name-card__other-reactions {
+  display: flex;
+  gap: 0.4rem;
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
+.name-card__other-badge.is-veto {
+  color: #dc2626;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 640px;
+  width: 100%;
+  position: relative;
+}
+
+.modal__close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: #6b7280;
+}
+
+.modal__subtitle {
+  color: #6b7280;
+  margin-top: -0.5rem;
+}
