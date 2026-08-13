@@ -59,6 +59,7 @@ export interface NameFiltersState {
   unisex_only: boolean;
   countries: string[];
   match_mode: "any" | "all";
+  search: string | null;
   year_min: number | null;
   year_max: number | null;
   rank_max: number | null;
@@ -79,6 +80,7 @@ export const DEFAULT_FILTERS: NameFiltersState = {
   unisex_only: false,
   countries: [],
   match_mode: "any",
+  search: null,
   year_min: null,
   year_max: null,
   rank_max: 500,

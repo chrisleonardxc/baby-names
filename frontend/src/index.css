@@ -83,6 +83,36 @@ button {
   font-weight: 600;
 }
 
+.search-bar {
+  padding: 1rem 1.5rem 0;
+}
+
+.search-bar input {
+  width: 100%;
+  max-width: 480px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  background: #fff;
+}
+
+.search-bar input:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    padding: 1rem 1rem 0;
+  }
+
+  .search-bar input {
+    max-width: none;
+  }
+}
+
 .page {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -167,6 +197,12 @@ button {
 
   .filter-panel {
     position: static;
+  }
+
+  .filter-panel__body {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 0.4rem;
   }
 }
 

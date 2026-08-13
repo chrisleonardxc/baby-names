@@ -3,6 +3,7 @@ import { getFavoritesOf } from "../api/client";
 import { FilterPanel } from "../components/FilterPanel";
 import { NameDetailModal } from "../components/NameDetailModal";
 import { ResultsGrid } from "../components/ResultsGrid";
+import { SearchBar } from "../components/SearchBar";
 import { useViewer } from "../context/ViewerContext";
 import { useNameFilters } from "../hooks/useNameFilters";
 
@@ -16,7 +17,9 @@ export function FavoritesPage() {
   if (!effectiveWhose) return null;
 
   return (
-    <div className="page">
+    <>
+      <SearchBar filters={filters} onChange={updateFilters} />
+      <div className="page">
       <div className="page__toggle-row">
         {people.map((p) => (
           <button
@@ -43,6 +46,7 @@ export function FavoritesPage() {
       {detail && (
         <NameDetailModal nameId={detail.nameId} sex={detail.sex} onClose={() => setDetail(null)} />
       )}
-    </div>
+      </div>
+    </>
   );
 }

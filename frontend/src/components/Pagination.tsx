@@ -31,9 +31,14 @@ export function Pagination({ page, totalPages, onChange }: Props) {
   if (totalPages <= 1) return null;
   const pages = getPageNumbers(page, totalPages);
 
+  const goTo = (p: number) => {
+    onChange(p);
+    window.scrollTo(0, 0);
+  };
+
   return (
     <div className="pagination">
-      <button disabled={page <= 1} onClick={() => onChange(page - 1)}>
+      <button disabled={page <= 1} onClick={() => goTo(page - 1)}>
         Previous
       </button>
       {pages.map((p, i) =>
@@ -46,13 +51,13 @@ export function Pagination({ page, totalPages, onChange }: Props) {
             key={p}
             className={`pagination__page ${p === page ? "is-active" : ""}`}
             aria-current={p === page ? "page" : undefined}
-            onClick={() => onChange(p)}
+            onClick={() => goTo(p)}
           >
             {p}
           </button>
         ),
       )}
-      <button disabled={page >= totalPages} onClick={() => onChange(page + 1)}>
+      <button disabled={page >= totalPages} onClick={() => goTo(page + 1)}>
         Next
       </button>
     </div>

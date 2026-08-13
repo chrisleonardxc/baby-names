@@ -22,6 +22,7 @@ def _build_filters(
     unisex_only: bool,
     countries: str | None,
     match_mode: str,
+    search: str | None,
     year_min: int | None,
     year_max: int | None,
     rank_max: int | None,
@@ -43,6 +44,7 @@ def _build_filters(
         unisex_only=unisex_only,
         countries=_parse_countries(countries),
         match_mode=match_mode,
+        search=search,
         year_min=year_min,
         year_max=year_max,
         rank_max=rank_max,
@@ -67,6 +69,7 @@ def list_names(
     unisex_only: bool = False,
     countries: str | None = None,
     match_mode: str = Query("any", pattern="^(any|all)$"),
+    search: str | None = None,
     year_min: int | None = None,
     year_max: int | None = None,
     rank_max: int | None = None,
@@ -86,7 +89,7 @@ def list_names(
     db: Session = Depends(get_session),
 ):
     filters = _build_filters(
-        sex, unisex_only, countries, match_mode, year_min, year_max, rank_max,
+        sex, unisex_only, countries, match_mode, search, year_min, year_max, rank_max,
         starting_letter, length_min, length_max, syllables_min, syllables_max,
         trend, viewer, exclude_vetoed, sort_by, sort_dir, page, page_size,
     )
@@ -102,6 +105,7 @@ def get_shortlist(
     unisex_only: bool = False,
     countries: str | None = None,
     match_mode: str = Query("any", pattern="^(any|all)$"),
+    search: str | None = None,
     year_min: int | None = None,
     year_max: int | None = None,
     rank_max: int | None = None,
@@ -119,7 +123,7 @@ def get_shortlist(
 ):
     shortlist_set = get_shortlist_name_sex(db)
     filters = _build_filters(
-        sex, unisex_only, countries, match_mode, year_min, year_max, rank_max,
+        sex, unisex_only, countries, match_mode, search, year_min, year_max, rank_max,
         starting_letter, length_min, length_max, syllables_min, syllables_max,
         trend, None, False, sort_by, sort_dir, page, page_size,
     )

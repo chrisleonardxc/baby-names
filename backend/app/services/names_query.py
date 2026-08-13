@@ -14,6 +14,7 @@ class NameFilters:
     unisex_only: bool = False
     countries: list[str] | None = None
     match_mode: str = "any"  # any | all
+    search: str | None = None
     year_min: int | None = None
     year_max: int | None = None
     rank_max: int | None = None
@@ -218,7 +219,11 @@ def query_names(db: Session, f: NameFilters):
 
     names_by_id = {n.id: n for n in db.query(DimName).filter(DimName.id.in_(name_ids)).all()}
 
+    search_term = f.search.strip().lower() if f.search else None
+
     def passes_name_filters(dim: DimName) -> bool:
+        if search_term and search_term not in dim.name_lower:
+            return False
         if f.starting_letter and dim.starting_letter.upper() != f.starting_letter.upper():
             return False
         if f.length_min is not None and dim.length < f.length_min:

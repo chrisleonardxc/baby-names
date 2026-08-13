@@ -12,6 +12,7 @@ function parseFilters(params: URLSearchParams): NameFiltersState {
     unisex_only: params.get("unisex_only") === "true",
     countries: params.get("countries")?.split(",").filter(Boolean) ?? [],
     match_mode: (params.get("match_mode") as NameFiltersState["match_mode"]) ?? DEFAULT_FILTERS.match_mode,
+    search: params.get("search"),
     year_min: num("year_min"),
     year_max: num("year_max"),
     rank_max: num("rank_max"),
@@ -34,6 +35,7 @@ function filtersToParams(filters: NameFiltersState): URLSearchParams {
   if (filters.unisex_only) params.set("unisex_only", "true");
   if (filters.countries.length) params.set("countries", filters.countries.join(","));
   if (filters.match_mode !== DEFAULT_FILTERS.match_mode) params.set("match_mode", filters.match_mode);
+  if (filters.search) params.set("search", filters.search);
   if (filters.year_min != null) params.set("year_min", String(filters.year_min));
   if (filters.year_max != null) params.set("year_max", String(filters.year_max));
   if (filters.rank_max != null) params.set("rank_max", String(filters.rank_max));

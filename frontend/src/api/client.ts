@@ -45,6 +45,7 @@ function filtersToQueryString(filters: NameFiltersState, extra?: Record<string, 
   if (filters.unisex_only) params.set("unisex_only", "true");
   if (filters.countries.length) params.set("countries", filters.countries.join(","));
   params.set("match_mode", filters.match_mode);
+  if (filters.search) params.set("search", filters.search);
   if (filters.year_min != null) params.set("year_min", String(filters.year_min));
   if (filters.year_max != null) params.set("year_max", String(filters.year_max));
   if (filters.rank_max != null) params.set("rank_max", String(filters.rank_max));
