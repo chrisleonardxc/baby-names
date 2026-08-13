@@ -5,7 +5,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     database_url: str = "sqlite:////data/baby_names.db"
-    cors_origins: str = "http://localhost:8080"
+    cors_origins: str = "http://localhost:8060"
 
     person_a_key: str = "person_a"
     person_a_name: str = "Person A"

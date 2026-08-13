@@ -24,9 +24,12 @@ docker compose up --build -d
 make seed               # one-time: loads all four countries (~3 min)
 ```
 
-Then open http://localhost:8080 (frontend) — it proxies `/api` to the backend
+Then open http://localhost:8060 (frontend) — it proxies `/api` to the backend
 automatically. The bare API is also reachable directly at http://localhost:8000 for
 debugging.
+
+Both ports are configurable via `.env` (`FRONTEND_PORT`, `API_PORT`) — set them there
+if 8060/8000 collide with something else on your machine.
 
 To (re-)load just one country without touching the others:
 ```bash
