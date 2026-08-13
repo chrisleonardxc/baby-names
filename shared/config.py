@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     person_b_key: str = "person_b"
     person_b_name: str = "Person B"
 
-    site_password: str = "bingo"
+    site_password: str = "PASSWORD"
 
     @property
     def cors_origin_list(self) -> list[str]:

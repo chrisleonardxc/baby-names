@@ -130,6 +130,46 @@ button {
   top: 1rem;
 }
 
+.filter-panel__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f2430;
+  cursor: pointer;
+}
+
+.filter-panel__toggle-arrow {
+  transition: transform 0.15s ease;
+}
+
+.filter-panel__toggle-arrow.is-open {
+  transform: rotate(90deg);
+}
+
+.filter-panel__body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .page {
+    grid-template-columns: 1fr;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .filter-panel {
+    position: static;
+  }
+}
+
 .filter-panel__group label {
   display: block;
   font-size: 0.8rem;

@@ -14,6 +14,16 @@ interface Props {
 
 export function FilterPanel({ filters, onChange }: Props) {
   const [countries, setCountries] = useState<CountryMeta[]>([]);
+  // Default collapsed on narrow screens, expanded on wide ones. Read after mount
+  // (not as a useState initializer) so it reflects the viewport's settled layout
+  // rather than a value that might not be current yet during the initial render.
+  // The toggle button is always visible either way, so this default can never
+  // leave someone stuck without a way to open/close it.
+  const [collapsed, setCollapsed] = useState(false);
+
+  useEffect(() => {
+    setCollapsed(window.innerWidth < 768);
+  }, []);
 
   useEffect(() => {
     getCountries().then(setCountries);
@@ -36,6 +46,12 @@ export function FilterPanel({ filters, onChange }: Props) {
 
   return (
     <div className="filter-panel">
+      <button className="filter-panel__toggle" onClick={() => setCollapsed(!collapsed)}>
+        <span>Filters</span>
+        <span className={`filter-panel__toggle-arrow ${collapsed ? "" : "is-open"}`}>&#8250;</span>
+      </button>
+      {collapsed ? null : (
+      <div className="filter-panel__body">
       <div className="filter-panel__group">
         <label>Sex</label>
         <div className="filter-panel__seg">
@@ -186,6 +202,8 @@ export function FilterPanel({ filters, onChange }: Props) {
           ))}
         </div>
       </div>
+      </div>
+      )}
     </div>
   );
 }
