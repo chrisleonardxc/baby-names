@@ -263,6 +263,12 @@ button {
   gap: 0.6rem;
 }
 
+.syllable-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
 .year-range-slider__presets {
   display: flex;
   gap: 0.3rem;

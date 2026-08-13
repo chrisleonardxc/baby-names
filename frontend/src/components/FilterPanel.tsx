@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getCountries } from "../api/client";
 import type { CountryMeta, NameFiltersState } from "../api/types";
 import { DualRangeSlider } from "./DualRangeSlider";
+import { SyllableFilter } from "./SyllableFilter";
 import { YearRangeSlider } from "./YearRangeSlider";
 
 const RANK_PRESETS = [10, 50, 100, 500, 1000];
@@ -170,6 +171,15 @@ export function FilterPanel({ filters, onChange }: Props) {
           onChange={(length_min, length_max) => onChange({ length_min, length_max })}
           labelMin="Minimum length"
           labelMax="Maximum length"
+        />
+      </div>
+
+      <div className="filter-panel__group">
+        <label>Syllables</label>
+        <SyllableFilter
+          valueMin={filters.syllables_min}
+          valueMax={filters.syllables_max}
+          onChange={(syllables_min, syllables_max) => onChange({ syllables_min, syllables_max })}
         />
       </div>
 
