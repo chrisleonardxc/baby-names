@@ -25,6 +25,20 @@ export function getPeople(): Promise<PersonMeta[]> {
   return getJSON<PersonMeta[]>("/meta/people");
 }
 
+export async function checkAuthStatus(): Promise<boolean> {
+  const res = await fetch(`${BASE}/auth/status`);
+  return res.ok;
+}
+
+export async function login(password: string): Promise<boolean> {
+  const res = await fetch(`${BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ password }),
+  });
+  return res.ok;
+}
+
 function filtersToQueryString(filters: NameFiltersState, extra?: Record<string, string>): string {
   const params = new URLSearchParams();
   params.set("sex", filters.sex);

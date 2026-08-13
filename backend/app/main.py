@@ -1,9 +1,10 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import meta, names, reactions
+from app.api.routes import auth, meta, names, reactions
+from app.auth import require_auth
 from shared.config import settings
 from shared.db import SessionLocal, init_db
 from shared.models import FactNameYear
@@ -21,9 +22,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(meta.router)
-app.include_router(names.router)
-app.include_router(reactions.router)
+app.include_router(auth.router)
+app.include_router(meta.router, dependencies=[Depends(require_auth)])
+app.include_router(names.router, dependencies=[Depends(require_auth)])
+app.include_router(reactions.router, dependencies=[Depends(require_auth)])
 
 
 @app.on_event("startup")

@@ -1,12 +1,19 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { NavTabs } from "./components/NavTabs";
+import { PasswordGate } from "./components/PasswordGate";
 import { ViewerToggle } from "./components/ViewerToggle";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ViewerProvider } from "./context/ViewerContext";
 import { BrowsePage } from "./pages/BrowsePage";
 import { FavoritesPage } from "./pages/FavoritesPage";
 import { ShortlistPage } from "./pages/ShortlistPage";
 
-function App() {
+function AppShell() {
+  const { authenticated } = useAuth();
+
+  if (authenticated === null) return null;
+  if (!authenticated) return <PasswordGate />;
+
   return (
     <ViewerProvider>
       <BrowserRouter>
@@ -24,6 +31,14 @@ function App() {
         </main>
       </BrowserRouter>
     </ViewerProvider>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <AppShell />
+    </AuthProvider>
   );
 }
 
