@@ -1,8 +1,7 @@
 """US national baby names, from the Social Security Administration.
 
-Reads from a vendored snapshot rather than downloading live -- see
-ingestion/vendored/PROVENANCE.md for why (ssa.gov blocks non-browser HTTP clients
-outright) and how to refresh it.
+Reads from the vendored snapshot at ingestion/vendored/us/names.zip -- see
+ingestion/vendored/PROVENANCE.md for refresh instructions.
 """
 
 import logging

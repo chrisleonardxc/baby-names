@@ -55,6 +55,17 @@ export function getNames(filters: NameFiltersState, viewer: string | null): Prom
   return getJSON<NamesResponse>(`/names?${qs}`);
 }
 
+export function getFavoritesOf(
+  filters: NameFiltersState,
+  viewer: string | null,
+  favoritedBy: string,
+): Promise<NamesResponse> {
+  const extra: Record<string, string> = { favorited_by: favoritedBy };
+  if (viewer) extra.viewer = viewer;
+  const qs = filtersToQueryString(filters, extra);
+  return getJSON<NamesResponse>(`/names?${qs}`);
+}
+
 export function getShortlist(filters: NameFiltersState): Promise<NamesResponse> {
   const qs = filtersToQueryString(filters);
   return getJSON<NamesResponse>(`/shortlist?${qs}`);

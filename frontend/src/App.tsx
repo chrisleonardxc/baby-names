@@ -3,6 +3,7 @@ import { NavTabs } from "./components/NavTabs";
 import { ViewerToggle } from "./components/ViewerToggle";
 import { ViewerProvider } from "./context/ViewerContext";
 import { BrowsePage } from "./pages/BrowsePage";
+import { FavoritesPage } from "./pages/FavoritesPage";
 import { ShortlistPage } from "./pages/ShortlistPage";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
         <main>
           <Routes>
             <Route path="/" element={<BrowsePage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/shortlist" element={<ShortlistPage />} />
           </Routes>
         </main>

@@ -36,8 +36,8 @@ def on_startup():
         has_data = session.query(FactNameYear.id).first() is not None
         if not has_data:
             logger.warning(
-                "No name data loaded yet. Run `make seed` (or `make seed-country COUNTRY=us_ssa`) "
-                "to ingest the open baby-name datasets."
+                "No name data loaded yet. Run `make seed` (or `make seed-country COUNTRY=us`) "
+                "to load the vendored baby-name datasets."
             )
     finally:
         session.close()

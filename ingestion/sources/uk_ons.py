@@ -1,12 +1,9 @@
 """UK (England & Wales) baby names, from ONS annual releases.
 
-Reads from vendored snapshots (ingestion/vendored/gb/{year}_{sex}.xlsx) rather than
-downloading live, per the project's offline-by-default ingestion design -- see
-ingestion/vendored/PROVENANCE.md. ONS also renames these files inconsistently every
-year (e.g. "2019boysnames.xlsx" vs "boysnames2022.xlsx" vs "2025boysbabynames.xlsx"),
-so there's no stable URL pattern to auto-discover new years from anyway. To add a
+Reads from vendored snapshots at ingestion/vendored/gb/{year}_{sex}.xlsx. To add a
 year: download that year's boys/girls XLSX from ons.gov.uk and drop it in
-ingestion/vendored/gb/ as "{year}_M.xlsx" / "{year}_F.xlsx".
+ingestion/vendored/gb/ as "{year}_M.xlsx" / "{year}_F.xlsx" -- see
+ingestion/vendored/PROVENANCE.md for details.
 """
 
 import logging

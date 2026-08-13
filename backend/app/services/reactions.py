@@ -39,3 +39,15 @@ def list_reactions(db: Session, person_key: str):
         raise ValueError(f"unknown person_key: {person_key}")
     rows = db.query(NameReaction).filter(NameReaction.person_id == person.id).all()
     return rows
+
+
+def get_favorited_name_sex(db: Session, person_key: str) -> set[tuple[int, str]]:
+    person = db.query(Person).filter(Person.key == person_key).one_or_none()
+    if person is None:
+        return set()
+    rows = (
+        db.query(NameReaction.name_id, NameReaction.sex)
+        .filter(NameReaction.person_id == person.id, NameReaction.reaction == "favorite")
+        .all()
+    )
+    return {(name_id, sex) for name_id, sex in rows}

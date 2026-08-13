@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from shared.config import settings
 from shared.models import DimName, FactNameCountrySexAgg, FactNameYear, NameReaction, Person
+from shared.trend import compute_trend
 
 
 @dataclass
@@ -97,18 +98,55 @@ def _fetch_stats(db: Session, sexes: list[str], countries: list[str] | None, f: 
     return q.all()
 
 
-def _fetch_trends(db: Session, name_ids: list[int], countries: list[str] | None, sexes: list[str]):
+def _fetch_trends(
+    db: Session,
+    name_ids: list[int],
+    countries: list[str] | None,
+    sexes: list[str],
+    year_min: int | None,
+    year_max: int | None,
+):
     if not name_ids:
         return {}
+
+    if year_min is None and year_max is None:
+        # Fast path: precomputed at ingestion time from each name's full history.
+        q = db.query(
+            FactNameCountrySexAgg.name_id,
+            FactNameCountrySexAgg.country_code,
+            FactNameCountrySexAgg.sex,
+            FactNameCountrySexAgg.trend,
+        ).filter(FactNameCountrySexAgg.name_id.in_(name_ids), FactNameCountrySexAgg.sex.in_(sexes))
+        if countries:
+            q = q.filter(FactNameCountrySexAgg.country_code.in_(countries))
+        return {(r.name_id, r.country_code, r.sex): r.trend for r in q.all()}
+
+    # A year range is selected: recompute trend from just those years. name_ids is
+    # already the rank/country/sex-filtered candidate set, so this leans on the
+    # (name_id, ...) unique-constraint index rather than scanning the full table.
     q = db.query(
-        FactNameCountrySexAgg.name_id,
-        FactNameCountrySexAgg.country_code,
-        FactNameCountrySexAgg.sex,
-        FactNameCountrySexAgg.trend,
-    ).filter(FactNameCountrySexAgg.name_id.in_(name_ids), FactNameCountrySexAgg.sex.in_(sexes))
+        FactNameYear.name_id,
+        FactNameYear.country_code,
+        FactNameYear.sex,
+        FactNameYear.year,
+        FactNameYear.rank,
+    ).filter(
+        FactNameYear.name_id.in_(name_ids),
+        FactNameYear.sex.in_(sexes),
+        FactNameYear.rank.isnot(None),
+    )
     if countries:
-        q = q.filter(FactNameCountrySexAgg.country_code.in_(countries))
-    return {(r.name_id, r.country_code, r.sex): r.trend for r in q.all()}
+        q = q.filter(FactNameYear.country_code.in_(countries))
+    if year_min is not None:
+        q = q.filter(FactNameYear.year >= year_min)
+    if year_max is not None:
+        q = q.filter(FactNameYear.year <= year_max)
+
+    groups: dict[tuple[int, str, str], list[tuple[int, int]]] = {}
+    for name_id, country_code, sex, year, rank in q.all():
+        groups.setdefault((name_id, country_code, sex), []).append((year, rank))
+
+    return {key: compute_trend(years_ranks)[0] for key, years_ranks in groups.items()}
 
 
 def _fetch_reactions(db: Session, name_ids: list[int], sexes: list[str]):
@@ -152,13 +190,16 @@ def query_names(db: Session, f: NameFilters):
         wanted = set(requested_countries)
         grouped = {k: v for k, v in grouped.items() if wanted.issubset(v.countries.keys())}
 
-    name_ids = list({name_id for name_id, _ in grouped.keys()})
-    trends = _fetch_trends(db, name_ids, requested_countries, sexes)
-    for (name_id, sex), row in grouped.items():
-        for country_code, stat in row.countries.items():
-            stat.trend = trends.get((name_id, country_code, sex))
-
+    # Trend is only needed for every candidate when actually filtering by it -- that
+    # can be a lot of names, especially with a wide year range. When just browsing
+    # (trend="any"), it's computed later for only the page actually being returned.
     if f.trend != "any":
+        name_ids = list({name_id for name_id, _ in grouped.keys()})
+        trends = _fetch_trends(db, name_ids, requested_countries, sexes, f.year_min, f.year_max)
+        for (name_id, sex), row in grouped.items():
+            for country_code, stat in row.countries.items():
+                stat.trend = trends.get((name_id, country_code, sex))
+
         grouped = {
             k: v
             for k, v in grouped.items()
@@ -221,6 +262,15 @@ def query_names(db: Session, f: NameFilters):
     total = len(filtered_rows)
     start = (f.page - 1) * f.page_size
     page_rows = filtered_rows[start : start + f.page_size]
+
+    if f.trend == "any":
+        # Not filtered above, so trend hasn't been computed yet -- do it now for just
+        # this page rather than every candidate that made it this far.
+        page_name_ids = list({dim.id for dim, _, _ in page_rows})
+        trends = _fetch_trends(db, page_name_ids, requested_countries, sexes, f.year_min, f.year_max)
+        for dim, sex, row in page_rows:
+            for country_code, stat in row.countries.items():
+                stat.trend = trends.get((dim.id, country_code, sex))
 
     results = []
     for dim, sex, row in page_rows:

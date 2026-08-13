@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.schemas import NameDetail, NamesResponse
 from app.services.name_detail import get_name_detail
 from app.services.names_query import NameFilters, query_names
+from app.services.reactions import get_favorited_name_sex
 from app.services.shortlist import get_shortlist_name_sex
 from shared.db import get_session
 
@@ -77,6 +78,7 @@ def list_names(
     trend: str = Query("any", pattern="^(rising|falling|stable|any)$"),
     viewer: str | None = None,
     exclude_vetoed: bool = False,
+    favorited_by: str | None = None,
     sort_by: str = Query("popularity", pattern="^(popularity|alpha|length)$"),
     sort_dir: str = Query("asc", pattern="^(asc|desc)$"),
     page: int = Query(1, ge=1),
@@ -88,6 +90,8 @@ def list_names(
         starting_letter, length_min, length_max, syllables_min, syllables_max,
         trend, viewer, exclude_vetoed, sort_by, sort_dir, page, page_size,
     )
+    if favorited_by:
+        filters.restrict_name_sex = get_favorited_name_sex(db, favorited_by)
     total, results = query_names(db, filters)
     return NamesResponse(total=total, page=page, page_size=page_size, results=results)
 

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { getCountries } from "../api/client";
 import type { CountryMeta, NameFiltersState } from "../api/types";
+import { DualRangeSlider } from "./DualRangeSlider";
+import { YearRangeSlider } from "./YearRangeSlider";
 
 const RANK_PRESETS = [10, 50, 100, 500, 1000];
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
@@ -108,25 +110,14 @@ export function FilterPanel({ filters, onChange }: Props) {
 
       {yearBounds.max > 0 && (
         <div className="filter-panel__group">
-          <label>
-            Year range: {filters.year_min ?? yearBounds.min} &ndash; {filters.year_max ?? yearBounds.max}
-          </label>
-          <div className="filter-panel__range">
-            <input
-              type="range"
-              min={yearBounds.min}
-              max={yearBounds.max}
-              value={filters.year_min ?? yearBounds.min}
-              onChange={(e) => onChange({ year_min: Number(e.target.value) })}
-            />
-            <input
-              type="range"
-              min={yearBounds.min}
-              max={yearBounds.max}
-              value={filters.year_max ?? yearBounds.max}
-              onChange={(e) => onChange({ year_max: Number(e.target.value) })}
-            />
-          </div>
+          <label>Year range</label>
+          <YearRangeSlider
+            minYear={yearBounds.min}
+            maxYear={yearBounds.max}
+            valueMin={filters.year_min ?? yearBounds.min}
+            valueMax={filters.year_max ?? yearBounds.max}
+            onChange={(year_min, year_max) => onChange({ year_min, year_max })}
+          />
         </div>
       )}
 
@@ -155,22 +146,15 @@ export function FilterPanel({ filters, onChange }: Props) {
         <label>
           Length: {filters.length_min ?? 2}&ndash;{filters.length_max ?? 15} letters
         </label>
-        <div className="filter-panel__range">
-          <input
-            type="range"
-            min={2}
-            max={15}
-            value={filters.length_min ?? 2}
-            onChange={(e) => onChange({ length_min: Number(e.target.value) })}
-          />
-          <input
-            type="range"
-            min={2}
-            max={15}
-            value={filters.length_max ?? 15}
-            onChange={(e) => onChange({ length_max: Number(e.target.value) })}
-          />
-        </div>
+        <DualRangeSlider
+          min={2}
+          max={15}
+          valueMin={filters.length_min ?? 2}
+          valueMax={filters.length_max ?? 15}
+          onChange={(length_min, length_max) => onChange({ length_min, length_max })}
+          labelMin="Minimum length"
+          labelMax="Maximum length"
+        />
       </div>
 
       <div className="filter-panel__group">

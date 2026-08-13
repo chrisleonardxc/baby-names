@@ -6,6 +6,9 @@ export function NavTabs() {
       <NavLink to="/" end className={({ isActive }) => (isActive ? "is-active" : "")}>
         Browse
       </NavLink>
+      <NavLink to="/favorites" className={({ isActive }) => (isActive ? "is-active" : "")}>
+        Favorites
+      </NavLink>
       <NavLink to="/shortlist" className={({ isActive }) => (isActive ? "is-active" : "")}>
         Shortlist
       </NavLink>

@@ -1,11 +1,8 @@
 """Alberta baby names, from Service Alberta's open data (vital statistics).
 
 Canada has no single federal baby-name dataset -- each province publishes its own.
-Alberta is the only one included so far (its files are clean and rank is provided
-directly); BC's open-data CSVs were attempted but the server drops the connection
-for every non-interactive-browser client tried (curl, a headless fetch, and a
-sandboxed browser navigation all failed) -- see ingestion/vendored/PROVENANCE.md.
-Add more provinces the same way as this one if/when their data is reachable.
+Alberta is the only one included so far. BC is not included; see
+ingestion/vendored/PROVENANCE.md. Add more provinces the same way as this one.
 
 Reads from vendored snapshots in ingestion/vendored/ca/.
 """

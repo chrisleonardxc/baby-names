@@ -3,31 +3,9 @@ import logging
 from sqlalchemy.orm import Session
 
 from shared.models import FactNameCountrySexAgg, FactNameYear
+from shared.trend import compute_trend
 
 logger = logging.getLogger("ingestion.rollup")
-
-
-def _compute_trend(years_ranks: list[tuple[int, int]]) -> tuple[str, float]:
-    """years_ranks: [(year, rank), ...] sorted by year, rank lower = more popular.
-    Compares the average rank of the earliest third of years vs the latest third.
-    A lower (better) recent rank than earlier => rising; higher => falling.
-    """
-    if len(years_ranks) < 2:
-        return "stable", 0.0
-
-    n = len(years_ranks)
-    third = max(1, n // 3)
-    early = years_ranks[:third]
-    recent = years_ranks[-third:]
-    early_avg = sum(r for _, r in early) / len(early)
-    recent_avg = sum(r for _, r in recent) / len(recent)
-
-    slope = early_avg - recent_avg  # positive => rank improved (rising popularity)
-    if slope > early_avg * 0.1:
-        return "rising", slope
-    if slope < -early_avg * 0.1:
-        return "falling", slope
-    return "stable", slope
 
 
 def rebuild_aggregates(session: Session) -> int:
@@ -64,7 +42,7 @@ def rebuild_aggregates(session: Session) -> int:
         first_year, last_year = years[0], years[-1]
 
         years_ranks = [(e[0], e[1]) for e in entries if e[1] is not None]
-        trend, slope = _compute_trend(years_ranks)
+        trend, slope = compute_trend(years_ranks)
 
         agg_rows.append(
             FactNameCountrySexAgg(

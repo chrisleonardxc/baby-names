@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { NameFiltersState, NamesResponse, ReactionValue } from "../api/types";
 import { NameCard } from "./NameCard";
+import { Pagination } from "./Pagination";
 
 interface Props {
   filters: NameFiltersState;
@@ -82,19 +83,7 @@ export function ResultsGrid({ filters, fetcher, onChangePage, onOpenDetail }: Pr
           />
         ))}
       </div>
-      {totalPages > 1 && (
-        <div className="results-grid__pagination">
-          <button disabled={data.page <= 1} onClick={() => onChangePage(data.page - 1)}>
-            Previous
-          </button>
-          <span>
-            Page {data.page} of {totalPages}
-          </span>
-          <button disabled={data.page >= totalPages} onClick={() => onChangePage(data.page + 1)}>
-            Next
-          </button>
-        </div>
-      )}
+      <Pagination page={data.page} totalPages={totalPages} onChange={onChangePage} />
     </div>
   );
 }
