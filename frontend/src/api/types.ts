@@ -78,7 +78,7 @@ export interface NameFiltersState {
 export const DEFAULT_FILTERS: NameFiltersState = {
   sex: "ALL",
   unisex_only: false,
-  countries: [],
+  countries: ["US"],
   match_mode: "any",
   search: null,
   year_min: null,

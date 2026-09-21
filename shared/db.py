@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, event
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from shared.config import settings
@@ -42,3 +42,24 @@ def init_db() -> None:
     from shared import models  # noqa: F401  (ensures models are registered on Base.metadata)
 
     Base.metadata.create_all(bind=engine)
+
+
+def analyze(only_if_missing: bool = False) -> None:
+    """Refresh SQLite's planner statistics (sqlite_stat1).
+
+    Without them the planner can't tell that e.g. `country_code, sex, year` narrows
+    fact_name_year far better than the unique index does, and year-range name
+    queries fall back to scanning every row (~5x slower). Ingestion calls this after
+    each load; API startup calls it with only_if_missing=True for databases seeded
+    before this existed.
+    """
+    if not settings.database_url.startswith("sqlite"):
+        return
+    with engine.begin() as conn:
+        if only_if_missing:
+            has_stats = conn.execute(
+                text("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'sqlite_stat1'")
+            ).first()
+            if has_stats:
+                return
+        conn.execute(text("ANALYZE"))

@@ -7,6 +7,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY shared ./shared
 COPY backend/app ./app
+COPY backend/scripts ./scripts
 
 ENV PYTHONPATH=/app
 EXPOSE 8000

@@ -67,6 +67,19 @@ WAL's shared-memory (`-shm`) file needs real `mmap` semantics, which break under
 Docker Desktop's virtualized bind mounts on macOS and can corrupt the database
 ("database disk image is malformed"). Don't switch this back to WAL.
 
+## Query performance
+
+Name search (`backend/app/services/names_query.py`) does all filtering, sorting, and
+pagination in a single SQL query and only loads the returned page into Python.
+It relies on SQLite's planner statistics (`ANALYZE`) to choose the right indexes:
+ingestion refreshes them after every load, and the API runs `ANALYZE` on startup if
+a database has never had it. It also needs SQLite 3.35+ (the Docker image ships 3.40).
+
+To time a spread of filter combinations against a seeded database:
+```bash
+docker compose exec api python scripts/bench_filters.py
+```
+
 ## Project layout
 
 ```

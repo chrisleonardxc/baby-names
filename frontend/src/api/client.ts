@@ -9,8 +9,8 @@ import type {
 
 const BASE = "/api";
 
-async function getJSON<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`);
+async function getJSON<T>(path: string, signal?: AbortSignal): Promise<T> {
+  const res = await fetch(`${BASE}${path}`, { signal });
   if (!res.ok) {
     throw new Error(`${path} failed: ${res.status}`);
   }
@@ -65,25 +65,30 @@ function filtersToQueryString(filters: NameFiltersState, extra?: Record<string, 
   return params.toString();
 }
 
-export function getNames(filters: NameFiltersState, viewer: string | null): Promise<NamesResponse> {
+export function getNames(
+  filters: NameFiltersState,
+  viewer: string | null,
+  signal?: AbortSignal,
+): Promise<NamesResponse> {
   const qs = filtersToQueryString(filters, viewer ? { viewer } : undefined);
-  return getJSON<NamesResponse>(`/names?${qs}`);
+  return getJSON<NamesResponse>(`/names?${qs}`, signal);
 }
 
 export function getFavoritesOf(
   filters: NameFiltersState,
   viewer: string | null,
   favoritedBy: string,
+  signal?: AbortSignal,
 ): Promise<NamesResponse> {
   const extra: Record<string, string> = { favorited_by: favoritedBy };
   if (viewer) extra.viewer = viewer;
   const qs = filtersToQueryString(filters, extra);
-  return getJSON<NamesResponse>(`/names?${qs}`);
+  return getJSON<NamesResponse>(`/names?${qs}`, signal);
 }
 
-export function getShortlist(filters: NameFiltersState): Promise<NamesResponse> {
+export function getShortlist(filters: NameFiltersState, signal?: AbortSignal): Promise<NamesResponse> {
   const qs = filtersToQueryString(filters);
-  return getJSON<NamesResponse>(`/shortlist?${qs}`);
+  return getJSON<NamesResponse>(`/shortlist?${qs}`, signal);
 }
 
 export function getNameDetail(nameId: number, sex: "M" | "F"): Promise<NameDetail> {

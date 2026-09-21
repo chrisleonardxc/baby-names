@@ -5,7 +5,7 @@ import { Pagination } from "./Pagination";
 
 interface Props {
   filters: NameFiltersState;
-  fetcher: (filters: NameFiltersState) => Promise<NamesResponse>;
+  fetcher: (filters: NameFiltersState, signal: AbortSignal) => Promise<NamesResponse>;
   onChangePage: (page: number) => void;
   onOpenDetail: (nameId: number, sex: "M" | "F") => void;
 }
@@ -17,9 +17,12 @@ export function ResultsGrid({ filters, fetcher, onChangePage, onOpenDetail }: Pr
 
   useEffect(() => {
     let cancelled = false;
+    // Abort the in-flight request when filters change again, so rapid changes
+    // don't leave a queue of stale searches running.
+    const controller = new AbortController();
     setLoading(true);
     setError(null);
-    fetcher(filters)
+    fetcher(filters, controller.signal)
       .then((res) => {
         if (!cancelled) setData(res);
       })
@@ -31,6 +34,7 @@ export function ResultsGrid({ filters, fetcher, onChangePage, onOpenDetail }: Pr
       });
     return () => {
       cancelled = true;
+      controller.abort();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(filters), fetcher]);
