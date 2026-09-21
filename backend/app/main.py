@@ -2,11 +2,12 @@ import logging
 
 from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import OperationalError
 
 from app.api.routes import auth, meta, names, reactions
 from app.auth import require_auth
 from shared.config import settings
-from shared.db import SessionLocal, init_db
+from shared.db import SessionLocal, analyze, init_db
 from shared.models import FactNameYear
 from shared.seed import seed_countries, seed_people
 
@@ -36,7 +37,14 @@ def on_startup():
         seed_countries(session)
         seed_people(session)
         has_data = session.query(FactNameYear.id).first() is not None
-        if not has_data:
+        if has_data:
+            # Purely a speedup, so never let it block startup (e.g. the database is
+            # locked by an ingestion run in progress; that run analyzes when done).
+            try:
+                analyze(only_if_missing=True)
+            except OperationalError:
+                logger.warning("Skipped ANALYZE on startup; will retry next restart", exc_info=True)
+        else:
             logger.warning(
                 "No name data loaded yet. Run `make seed` (or `make seed-country COUNTRY=us`) "
                 "to load the vendored baby-name datasets."

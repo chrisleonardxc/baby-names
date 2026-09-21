@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { getFavoritesOf } from "../api/client";
+import type { NameFiltersState } from "../api/types";
 import { FilterPanel } from "../components/FilterPanel";
 import { NameDetailModal } from "../components/NameDetailModal";
 import { ResultsGrid } from "../components/ResultsGrid";
@@ -14,6 +15,12 @@ export function FavoritesPage() {
   const [detail, setDetail] = useState<{ nameId: number; sex: "M" | "F" } | null>(null);
 
   const effectiveWhose = whoseFavorites ?? viewer;
+  // Stable identity: ResultsGrid refetches whenever its fetcher changes.
+  const fetcher = useCallback(
+    (f: NameFiltersState, signal: AbortSignal) =>
+      getFavoritesOf(f, viewer, effectiveWhose ?? "", signal),
+    [viewer, effectiveWhose],
+  );
   if (!effectiveWhose) return null;
 
   return (
@@ -39,7 +46,7 @@ export function FavoritesPage() {
       <FilterPanel filters={filters} onChange={updateFilters} />
       <ResultsGrid
         filters={filters}
-        fetcher={(f) => getFavoritesOf(f, viewer, effectiveWhose)}
+        fetcher={fetcher}
         onChangePage={(page) => updateFilters({ page })}
         onOpenDetail={(nameId, sex) => setDetail({ nameId, sex })}
       />

@@ -10,27 +10,38 @@ from shared.models import Country, FactNameYear, Person
 router = APIRouter(prefix="/api/meta", tags=["meta"])
 
 
+def _year_bound(db: Session, country_code: str, latest: bool) -> int | None:
+    # One MIN/MAX per (country, sex) is a single seek on the (country_code, sex,
+    # year) index; a GROUP BY across countries would scan every yearly row.
+    agg = func.max if latest else func.min
+    values = [
+        db.query(agg(FactNameYear.year))
+        .filter(FactNameYear.country_code == country_code, FactNameYear.sex == sex)
+        .scalar()
+        for sex in ("M", "F")
+    ]
+    values = [v for v in values if v is not None]
+    if not values:
+        return None
+    return max(values) if latest else min(values)
+
+
 @router.get("/countries", response_model=list[CountryMeta])
 def get_countries(db: Session = Depends(get_session)):
-    rows = (
-        db.query(
-            FactNameYear.country_code,
-            func.min(FactNameYear.year).label("min_year"),
-            func.max(FactNameYear.year).label("max_year"),
+    result = []
+    for country in db.query(Country).order_by(Country.code).all():
+        min_year = _year_bound(db, country.code, latest=False)
+        if min_year is None:
+            continue  # seeded country with no data loaded yet
+        result.append(
+            CountryMeta(
+                country_code=country.code,
+                display_name=country.display_name,
+                min_year=min_year,
+                max_year=_year_bound(db, country.code, latest=True),
+            )
         )
-        .group_by(FactNameYear.country_code)
-        .all()
-    )
-    display_names = {c.code: c.display_name for c in db.query(Country).all()}
-    return [
-        CountryMeta(
-            country_code=r.country_code,
-            display_name=display_names.get(r.country_code, r.country_code),
-            min_year=r.min_year,
-            max_year=r.max_year,
-        )
-        for r in rows
-    ]
+    return result
 
 
 @router.get("/people", response_model=list[PersonMeta])

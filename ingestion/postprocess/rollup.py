@@ -2,6 +2,7 @@ import logging
 
 from sqlalchemy.orm import Session
 
+from shared.db import analyze
 from shared.models import FactNameCountrySexAgg, FactNameYear
 from shared.trend import compute_trend
 
@@ -61,4 +62,7 @@ def rebuild_aggregates(session: Session) -> int:
     session.bulk_save_objects(agg_rows)
     session.commit()
     logger.info("rebuilt %d aggregate rows", len(agg_rows))
+
+    # Table contents just changed wholesale; refresh the query planner's stats.
+    analyze()
     return len(agg_rows)

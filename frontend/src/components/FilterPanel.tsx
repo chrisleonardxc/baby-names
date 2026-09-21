@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getCountries } from "../api/client";
 import type { CountryMeta, NameFiltersState } from "../api/types";
+import { useDebouncedRange } from "../hooks/useDebouncedRange";
 import { DualRangeSlider } from "./DualRangeSlider";
 import { SyllableFilter } from "./SyllableFilter";
 import { YearRangeSlider } from "./YearRangeSlider";
@@ -37,6 +38,21 @@ export function FilterPanel({ filters, onChange }: Props) {
     }),
     { min: 9999, max: 0 },
   );
+
+  const [lengthMin, lengthMax, setLength] = useDebouncedRange(
+    filters.length_min ?? 2,
+    filters.length_max ?? 15,
+    (length_min, length_max) => onChange({ length_min, length_max }),
+  );
+
+  // Selecting the full span is the same as no year filter, and "no year filter"
+  // is served from precomputed all-time stats instead of aggregating every year.
+  const changeYears = (year_min: number, year_max: number) =>
+    onChange(
+      year_min <= yearBounds.min && year_max >= yearBounds.max
+        ? { year_min: null, year_max: null }
+        : { year_min, year_max },
+    );
 
   const toggleCountry = (code: string) => {
     const set = new Set(filters.countries);
@@ -79,6 +95,12 @@ export function FilterPanel({ filters, onChange }: Props) {
       <div className="filter-panel__group">
         <label>Country</label>
         <div className="filter-panel__chips">
+          <button
+            className={filters.countries.length === 0 ? "is-active" : ""}
+            onClick={() => onChange({ countries: [] })}
+          >
+            All
+          </button>
           {countries.map((c) => (
             <button
               key={c.country_code}
@@ -133,7 +155,7 @@ export function FilterPanel({ filters, onChange }: Props) {
             maxYear={yearBounds.max}
             valueMin={filters.year_min ?? yearBounds.min}
             valueMax={filters.year_max ?? yearBounds.max}
-            onChange={(year_min, year_max) => onChange({ year_min, year_max })}
+            onChange={changeYears}
           />
         </div>
       )}
@@ -161,14 +183,14 @@ export function FilterPanel({ filters, onChange }: Props) {
 
       <div className="filter-panel__group">
         <label>
-          Length: {filters.length_min ?? 2}&ndash;{filters.length_max ?? 15} letters
+          Length: {lengthMin}&ndash;{lengthMax} letters
         </label>
         <DualRangeSlider
           min={2}
           max={15}
-          valueMin={filters.length_min ?? 2}
-          valueMax={filters.length_max ?? 15}
-          onChange={(length_min, length_max) => onChange({ length_min, length_max })}
+          valueMin={lengthMin}
+          valueMax={lengthMax}
+          onChange={setLength}
           labelMin="Minimum length"
           labelMax="Maximum length"
         />

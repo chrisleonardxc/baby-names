@@ -1,3 +1,4 @@
+import { useDebouncedRange } from "../hooks/useDebouncedRange";
 import { DualRangeSlider } from "./DualRangeSlider";
 
 const RESOLUTION = 1000;
@@ -33,12 +34,14 @@ interface Props {
   onChange: (min: number, max: number) => void;
 }
 
-export function YearRangeSlider({ minYear, maxYear, valueMin, valueMax, onChange }: Props) {
+export function YearRangeSlider({ minYear, maxYear, valueMin: committedMin, valueMax: committedMax, onChange }: Props) {
+  // Draft years follow the thumbs live; the (expensive) filter change is debounced.
+  const [valueMin, valueMax, setDraft] = useDebouncedRange(committedMin, committedMax, onChange);
   const indexMin = indexForYear(valueMin, minYear, maxYear);
   const indexMax = indexForYear(valueMax, minYear, maxYear);
 
-  const setRange = (min: number, max: number) => {
-    onChange(Math.min(min, max), Math.max(min, max));
+  const setRange = (min: number, max: number, immediate = false) => {
+    setDraft(Math.min(min, max), Math.max(min, max), immediate);
   };
 
   const presets: { label: string; years: number | null }[] = [
@@ -68,7 +71,7 @@ export function YearRangeSlider({ minYear, maxYear, valueMin, valueMax, onChange
             key={p.label}
             className={isPresetActive(p.years) ? "is-active" : ""}
             onClick={() =>
-              setRange(p.years == null ? minYear : Math.max(minYear, maxYear - p.years + 1), maxYear)
+              setRange(p.years == null ? minYear : Math.max(minYear, maxYear - p.years + 1), maxYear, true)
             }
           >
             {p.label}
